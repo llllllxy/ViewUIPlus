@@ -1,8 +1,8 @@
-import { createApp, h, getCurrentInstance } from 'vue';
+import {createApp, h, getCurrentInstance, nextTick} from 'vue';
 import Modal from './modal.vue';
 import Button from '../button/button.vue';
 import Locale from '../../mixins/locale';
-import { isClient } from '../../utils/index';
+import {isClient} from '../../utils/index';
 
 const prefixCls = 'ivu-modal-confirm';
 
@@ -16,8 +16,8 @@ Modal.newInstance = properties => {
     let _instance = null;
 
     const Instance = createApp({
-        mixins: [ Locale ],
-        data () {
+        mixins: [Locale],
+        data() {
             return Object.assign({}, _props, {
                 visible: false,
                 width: 416,
@@ -35,7 +35,7 @@ Modal.newInstance = properties => {
                 closing: false // 关闭有动画，期间使用此属性避免重复点击
             });
         },
-        render () {
+        render() {
             let footerVNodes = [];
             if (this.showCancel) {
                 footerVNodes.push(h(Button, {
@@ -86,15 +86,15 @@ Modal.newInstance = properties => {
             }
 
             return h(Modal, Object.assign({}, _props, {
-                width: this.width,
-                scrollable: this.scrollable,
-                closable: this.closable,
-                ref: 'modal'
-            }, {
-                modelValue: this.visible,
-                'onUpdate:modelValue': (status) => this.visible = status,
-                'onOn-cancel': this.cancel
-            }),
+                    width: this.width,
+                    scrollable: this.scrollable,
+                    closable: this.closable,
+                    ref: 'modal'
+                }, {
+                    modelValue: this.visible,
+                    'onUpdate:modelValue': (status) => this.visible = status,
+                    'onOn-cancel': this.cancel
+                }),
                 () => h('div', {
                     class: prefixCls
                 }, [
@@ -107,26 +107,26 @@ Modal.newInstance = properties => {
             );
         },
         computed: {
-            iconTypeCls () {
+            iconTypeCls() {
                 return [
                     `${prefixCls}-head-icon`,
                     `${prefixCls}-head-icon-${this.iconType}`
                 ];
             },
-            iconNameCls () {
+            iconNameCls() {
                 return [
                     'ivu-icon',
                     `ivu-icon-${this.iconName}`
                 ];
             },
-            localeOkText () {
+            localeOkText() {
                 if (this.okText) {
                     return this.okText;
                 } else {
                     return this.t('i.modal.okText');
                 }
             },
-            localeCancelText () {
+            localeCancelText() {
                 if (this.cancelText) {
                     return this.cancelText;
                 } else {
@@ -135,14 +135,14 @@ Modal.newInstance = properties => {
             }
         },
         methods: {
-            cancel () {
+            cancel() {
                 if (this.closing) return;
                 this.$refs.modal.visible = false;
                 this.buttonLoading = false;
                 this.onCancel();
                 this.remove();
             },
-            ok () {
+            ok() {
                 if (this.closing) return;
                 if (this.loading) {
                     this.buttonLoading = true;
@@ -152,23 +152,26 @@ Modal.newInstance = properties => {
                 }
                 this.onOk();
             },
-            remove () {
+            remove() {
                 this.closing = true;
                 setTimeout(() => {
                     this.closing = false;
                     this.destroy();
                 }, 300);
             },
-            destroy () {
+            destroy() {
                 Instance.unmount();
                 document.body.removeChild(container);
                 this.onRemove();
             },
-            onOk () {},
-            onCancel () {},
-            onRemove () {}
+            onOk() {
+            },
+            onCancel() {
+            },
+            onRemove() {
+            }
         },
-        created () {
+        created() {
             _instance = getCurrentInstance();
         }
     });
@@ -177,75 +180,78 @@ Modal.newInstance = properties => {
     const modal = _instance.refs.modal;
 
     return {
-        show (props) {
-            modal.$parent.showCancel = props.showCancel;
-            modal.$parent.iconType = props.icon;
+        show(props) {
+            nextTick(() => {
+                const modal = _instance.refs.modal;
+                modal.$parent.showCancel = props.showCancel;
+                modal.$parent.iconType = props.icon;
 
-            switch (props.icon) {
-                case 'info':
-                    modal.$parent.iconName = 'ios-information-circle';
-                    break;
-                case 'success':
-                    modal.$parent.iconName = 'ios-checkmark-circle';
-                    break;
-                case 'warning':
-                    modal.$parent.iconName = 'ios-alert';
-                    break;
-                case 'error':
-                    modal.$parent.iconName = 'ios-close-circle';
-                    break;
-                case 'confirm':
-                    modal.$parent.iconName = 'ios-help-circle';
-                    break;
-            }
+                switch (props.icon) {
+                    case 'info':
+                        modal.$parent.iconName = 'ios-information-circle';
+                        break;
+                    case 'success':
+                        modal.$parent.iconName = 'ios-checkmark-circle';
+                        break;
+                    case 'warning':
+                        modal.$parent.iconName = 'ios-alert';
+                        break;
+                    case 'error':
+                        modal.$parent.iconName = 'ios-close-circle';
+                        break;
+                    case 'confirm':
+                        modal.$parent.iconName = 'ios-help-circle';
+                        break;
+                }
 
-            if ('width' in props) {
-                modal.$parent.width = props.width;
-            }
+                if ('width' in props) {
+                    modal.$parent.width = props.width;
+                }
 
-            if ('closable' in props) {
-                modal.$parent.closable = props.closable;
-            }
+                if ('closable' in props) {
+                    modal.$parent.closable = props.closable;
+                }
 
-            if ('title' in props) {
-                modal.$parent.title = props.title;
-            }
+                if ('title' in props) {
+                    modal.$parent.title = props.title;
+                }
 
-            if ('content' in props) {
-                modal.$parent.body = props.content;
-            }
+                if ('content' in props) {
+                    modal.$parent.body = props.content;
+                }
 
-            if ('okText' in props) {
-                modal.$parent.okText = props.okText;
-            }
+                if ('okText' in props) {
+                    modal.$parent.okText = props.okText;
+                }
 
-            if ('cancelText' in props) {
-                modal.$parent.cancelText = props.cancelText;
-            }
+                if ('cancelText' in props) {
+                    modal.$parent.cancelText = props.cancelText;
+                }
 
-            if ('onCancel' in props) {
-                modal.$parent.onCancel = props.onCancel;
-            }
+                if ('onCancel' in props) {
+                    modal.$parent.onCancel = props.onCancel;
+                }
 
-            if ('onOk' in props) {
-                modal.$parent.onOk = props.onOk;
-            }
+                if ('onOk' in props) {
+                    modal.$parent.onOk = props.onOk;
+                }
 
-            // async for ok
-            if ('loading' in props) {
-                modal.$parent.loading = props.loading;
-            }
+                // async for ok
+                if ('loading' in props) {
+                    modal.$parent.loading = props.loading;
+                }
 
-            if ('scrollable' in props) {
-                modal.$parent.scrollable = props.scrollable;
-            }
+                if ('scrollable' in props) {
+                    modal.$parent.scrollable = props.scrollable;
+                }
 
-            // notice when component destroy
-            modal.$parent.onRemove = props.onRemove;
+                // notice when component destroy
+                modal.$parent.onRemove = props.onRemove;
 
-            modal.visible = true;
+                modal.visible = true;
+            })
         },
-        remove () {
+        remove() {
             modal.visible = false;
             modal.$parent.buttonLoading = false;
             modal.$parent.remove();
