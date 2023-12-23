@@ -24822,7 +24822,7 @@ const _sfc_main$Y = {
     fullscreenIconStyles() {
       let style2 = {};
       const styleRight = {
-        right: this.closable ? "44px" : "14px"
+        right: this.closable ? "34px" : "8px"
       };
       Object.assign(style2, styleRight);
       return style2;
@@ -25123,7 +25123,7 @@ function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
               style: normalizeStyle($options.contentStyles),
               onClick: _cache[4] || (_cache[4] = (...args) => $options.handleClickModal && $options.handleClickModal(...args))
             }, [
-              $props.showFullscreenIcon ? (openBlock(), createElementBlock("a", {
+              $props.showFullscreenIcon ? (openBlock(), createElementBlock("div", {
                 key: 0,
                 class: normalizeClass([$data.prefixCls + "-fullscreen-icon"]),
                 style: normalizeStyle($options.fullscreenIconStyles),
@@ -38441,7 +38441,7 @@ var style = {
   }
 };
 const name = "@leisure01/view-ui-plus";
-const version$1 = "1.3.19";
+const version$1 = "1.3.20";
 const title = "ViewUIPlus";
 const description = "A high quality UI components Library with Vue.js 3";
 const homepage = "https://www.iviewui.com";

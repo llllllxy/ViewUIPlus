@@ -9,9 +9,12 @@ View UI Plus
     <h3>An enterprise-level UI component library and front-end solution based on Vue.js 3</h3>
 </h1>
 
-[![View UI Plus](https://img.shields.io/npm/v/view-ui-plus.svg?style=flat-square)](https://www.npmjs.org/package/view-ui-plus)
-[![NPM downloads](http://img.shields.io/npm/dm/view-ui-plus.svg?style=flat-square)](https://npmjs.org/package/view-ui-plus)
-[![NPM downloads](https://img.shields.io/npm/dt/view-ui-plus.svg?style=flat-square)](https://npmjs.org/package/view-ui-plus)
+> View UI Plus自从发布1.3.1版本后基本上就不再维护更新，但由于工作开发中涉及该UI库，因此本人另开分支继续维护开发使用。
+
+
+[![View UI Plus](https://img.shields.io/npm/v/@leisure01/view-ui-plus.svg?style=flat-square)](https://www.npmjs.org/package/@leisure01/view-ui-plus)
+[![NPM downloads](http://img.shields.io/npm/dm/@leisure01/view-ui-plus.svg?style=flat-square)](https://npmjs.org/package/@leisure01/view-ui-plus)
+[![NPM downloads](https://img.shields.io/npm/dt/@leisure01/view-ui-plus.svg?style=flat-square)](https://npmjs.org/package/@leisure01/view-ui-plus)
 ![JS gzip size](http://img.badgesize.io/https://unpkg.com/view-ui-plus/dist/viewuiplus.min.js?compression=gzip&label=gzip%20size:%20JS&style=flat-square)
 ![CSS gzip size](http://img.badgesize.io/https://unpkg.com/view-ui-plus/dist/styles/viewuiplus.css?compression=gzip&label=gzip%20size:%20CSS&style=flat-square)
 [![Join the chat at https://gitter.im/iview/iview](https://img.shields.io/badge/chat-on_gitter-30b392.svg?style=flat-square)](https://gitter.im/iview/iview?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -23,36 +26,37 @@ View UI Plus
 ## Start On Cloud IDE
 [https://idegithub.com/view-design/ViewUIPlus](https://idegithub.com/view-design/ViewUIPlus)
 
-## Features
-
-- Dozens of useful and beautiful components.
-- Friendly API. It's made for people with any skills level.
-- Extensive documentations and demos.
-- It is  quite awesome.
-
-## Install
-
-We provide starter kit for you.
-- [View UI Plus Project (Based on Vue CLI)](https://github.com/view-design/view-ui-project-vuecli)
-- [View UI Plus Project (Based on Vite)](https://github.com/view-design/view-ui-project-vite)
-- [View UI Plus Project (Based on TypeScript)](https://github.com/view-design/view-ui-project-ts)
-- [View UI Plus Project (Based on Nuxt)](https://github.com/view-design/view-ui-project-nuxt)
-
 ### Install View UI Plus
 
 Using npm:
 ```
-npm install view-ui-plus --save
+npm i @leisure01/view-ui-plus --save
 ```
 
 Using a script tag for global use:
-
 ```html
 <script type="text/javascript" src="viewuiplus.min.js"></script>
 <link rel="stylesheet" href="dist/styles/viewuiplus.css">
 ```
 
 You can find more info [on the website](https://www.iviewui.com/view-ui-plus/guide/install).
+
+### Import View UI Plus
+```
+import { createApp } from 'vue'
+import ViewUIPlus from "@leisure01/view-ui-plus"; //引入ViewUIPlus
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import "@leisure01/view-ui-plus/dist/styles/viewuiplus.css";
+
+const app = createApp(App)
+
+app.use(store)
+  .use(router)
+  .use(ViewUIPlus)
+  .mount('#app')
+```
 
 ## Usage
 
@@ -64,12 +68,6 @@ You can find more info [on the website](https://www.iviewui.com/view-ui-plus/gui
     import { ref } from 'vue'
     const value = ref([20, 50])
 </script>
-```
-
-Using css via `import`:
-
-```js
-import 'view-ui-plus/dist/styles/viewuiplus.css'
 ```
 
 ## Community
