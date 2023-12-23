@@ -7,11 +7,11 @@
             <transition :name="transitionNames[0]" @after-leave="animationFinish">
                 <div v-bind="$attrs" :class="classes" :style="mainStyles" v-show="visible" @mousedown="handleMousedown">
                     <div :class="contentClasses" ref="content" :style="contentStyles" @click="handleClickModal">
-                        <a :class="[prefixCls + '-fullscreen-icon']" :style="fullscreenIconStyles" v-if="showFullscreenIcon" @click="handleFullscreen">
+                        <div :class="[prefixCls + '-fullscreen-icon']" :style="fullscreenIconStyles" v-if="showFullscreenIcon" @click="handleFullscreen">
                             <slot name="fullscreen">
                                 <Icon :type="fullscreen ? 'md-contract' : 'md-expand'"></Icon>
                             </slot>
-                        </a>
+                        </div>
                         <a :class="[prefixCls + '-close']" v-if="closable" @click="close">
                             <slot name="close">
                                 <Icon type="ios-close"></Icon>
@@ -266,7 +266,7 @@
             fullscreenIconStyles () {
                 let style = {};
                 const styleRight = {
-                    right: this.closable ? '44px' : '14px'
+                    right: this.closable ? '34px' : '8px'
                 };
                 Object.assign(style, styleRight);
                 return style;
