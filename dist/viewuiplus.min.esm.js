@@ -1421,9 +1421,9 @@ var popper = { exports: {} };
         width: rect.right - rect.left,
         height: rect.bottom - rect.top
       };
-      var sizes = element.nodeName === "HTML" ? getWindowSizes(element.ownerDocument) : {};
-      var width = sizes.width || element.clientWidth || result.width;
-      var height2 = sizes.height || element.clientHeight || result.height;
+      var sizes2 = element.nodeName === "HTML" ? getWindowSizes(element.ownerDocument) : {};
+      var width = sizes2.width || element.clientWidth || result.width;
+      var height2 = sizes2.height || element.clientHeight || result.height;
       var horizScrollbar = element.offsetWidth - width;
       var vertScrollbar = element.offsetHeight - height2;
       if (horizScrollbar || vertScrollbar) {
@@ -4271,7 +4271,11 @@ const _sfc_main$2m = {
         }));
         select2.slotOptionsMap.set(value, instance);
         const { modelValue } = select2;
-        modelValue && modelValue.length && select2.lazyUpdateValue(true);
+        if (typeof modelValue === "number") {
+          select2.lazyUpdateValue(true);
+        } else {
+          modelValue && modelValue.length && select2.lazyUpdateValue(true);
+        }
       }
     },
     removeOption() {
@@ -4940,7 +4944,7 @@ function _sfc_render$25(_ctx, _cache, $props, $setup, $data, $options) {
         onCompositionupdate: _cache[23] || (_cache[23] = (...args) => $options.handleComposition && $options.handleComposition(...args)),
         onCompositionend: _cache[24] || (_cache[24] = (...args) => $options.handleComposition && $options.handleComposition(...args)),
         onInput: _cache[25] || (_cache[25] = (...args) => $options.handleInput && $options.handleInput(...args))
-      }, "\n            ", 46, _hoisted_8$5),
+      }, "\r\n            ", 46, _hoisted_8$5),
       $props.showWordLimit ? (openBlock(), createElementBlock("span", _hoisted_9$5, toDisplayString($options.textLength) + "/" + toDisplayString($options.upperLimit), 1)) : createCommentVNode("", true)
     ], 64))
   ], 2);
@@ -5262,15 +5266,19 @@ const _sfc_main$2j = {
     }
   },
   beforeCreate() {
-    this.slotTemp = this.$slots.default ? this.$slots.default() : null;
+    this.$nextTick(() => {
+      this.slotTemp = this.$slots.default ? this.$slots.default() : null;
+    });
   },
   mounted() {
     this.setScale();
   },
   updated() {
-    const slot = this.$slots.default ? this.$slots.default() : null;
-    if (slot && slot !== this.slotTemp)
-      this.setScale();
+    this.$nextTick(() => {
+      const slot = this.$slots.default ? this.$slots.default() : null;
+      if (slot && slot !== this.slotTemp)
+        this.setScale();
+    });
   }
 };
 const _hoisted_1$1g = ["src"];
@@ -8555,9 +8563,7 @@ const _sfc_main$23 = {
       if (rules2.length && this.required) {
         return;
       } else if (rules2.length) {
-        rules2.every((rule) => {
-          this.isRequired = rule.required;
-        });
+        this.isRequired = rules2.some((rule) => rule.required);
       } else if (this.required) {
         this.isRequired = this.required;
       }
@@ -14932,7 +14938,10 @@ Notification$1.newInstance = (properties) => {
     destroy(element) {
       notification.closeAll();
       isClient && setTimeout(function() {
-        document.body.removeChild(document.getElementsByClassName(element)[0]);
+        const removeElement = document.querySelectorAll(`.${element}`)[0];
+        if (container && removeElement) {
+          container.removeChild(removeElement);
+        }
       }, 500);
     }
   };
@@ -22940,7 +22949,25 @@ const _sfc_main$19 = {
       this.focused = true;
       this.$emit("on-focus", event);
     },
-    blur() {
+    blur(event) {
+      let val = event.target.value.trim();
+      if (this.parser) {
+        val = this.parser(val);
+      }
+      const isEmptyString = val.length === 0;
+      if (isEmptyString) {
+        this.setValue(null);
+        return;
+      }
+      if (event.type === "input" && val.match(/^\-?\.?$|\.$/))
+        return;
+      val = Number(val);
+      if (!isNaN(val)) {
+        this.currentValue = val;
+        this.setValue(val);
+      } else {
+        event.target.value = this.currentValue;
+      }
       this.focused = false;
       this.$emit("on-blur");
       if (!findComponentUpward(this, ["DatePicker", "TimePicker", "Cascader", "Search"])) {
@@ -22961,24 +22988,6 @@ const _sfc_main$19 = {
         return;
       if (event.type === "input" && !this.activeChange)
         return;
-      let val = event.target.value.trim();
-      if (this.parser) {
-        val = this.parser(val);
-      }
-      const isEmptyString = val.length === 0;
-      if (isEmptyString) {
-        this.setValue(null);
-        return;
-      }
-      if (event.type === "input" && val.match(/^\-?\.?$|\.$/))
-        return;
-      val = Number(val);
-      if (!isNaN(val)) {
-        this.currentValue = val;
-        this.setValue(val);
-      } else {
-        event.target.value = this.currentValue;
-      }
     },
     changeVal(val) {
       val = Number(val);
@@ -24042,9 +24051,14 @@ LoadingBar.newInstance = (properties) => {
   const container = document.createElement("div");
   document.body.appendChild(container);
   Instance.mount(container);
-  const loading_bar = _instance.refs.loadingBar;
+  let loading_bar;
+  nextTick(() => {
+    loading_bar = _instance.refs.loadingBar;
+  });
   return {
     update(options) {
+      if (!loading_bar)
+        return;
       if ("percent" in options) {
         loading_bar.percent = options.percent;
       }
@@ -24615,7 +24629,7 @@ const _sfc_main$Y = {
   name: "Modal",
   mixins: [Locale, ScrollbarMixins],
   components: { Icon, iButton: _sfc_main$2c },
-  emits: ["on-cancel", "on-ok", "on-hidden", "on-visible-change", "update:modelValue"],
+  emits: ["on-cancel", "on-ok", "on-hidden", "on-visible-change", "on-fullscreen", "update:modelValue", "update:fullscreenValue"],
   provide() {
     return {
       ModalInstance: this
@@ -24684,7 +24698,11 @@ const _sfc_main$Y = {
         return !global2.$VIEWUI || global2.$VIEWUI.transfer === "" ? true : global2.$VIEWUI.transfer;
       }
     },
-    fullscreen: {
+    fullscreenValue: {
+      type: Boolean,
+      default: false
+    },
+    showFullscreenIcon: {
       type: Boolean,
       default: false
     },
@@ -24722,6 +24740,7 @@ const _sfc_main$Y = {
       showHead: true,
       buttonLoading: false,
       visible: this.modelValue,
+      fullscreen: this.fullscreenValue,
       dragData: deepCopy(dragData),
       modalIndex: this.handleGetModalIndex(),
       isMouseTriggerIn: false,
@@ -24800,6 +24819,14 @@ const _sfc_main$Y = {
       }
       return style2;
     },
+    fullscreenIconStyles() {
+      let style2 = {};
+      const styleRight = {
+        right: this.closable ? "44px" : "14px"
+      };
+      Object.assign(style2, styleRight);
+      return style2;
+    },
     localeOkText() {
       if (this.okText === void 0) {
         return this.t("i.modal.okText");
@@ -24819,6 +24846,11 @@ const _sfc_main$Y = {
     }
   },
   methods: {
+    handleFullscreen() {
+      this.fullscreen = !this.fullscreen;
+      this.$emit("update:fullscreenValue", this.fullscreen);
+      this.$emit("on-fullscreen", this.fullscreen);
+    },
     close() {
       if (!this.beforeClose) {
         return this.handleClose();
@@ -25006,6 +25038,12 @@ const _sfc_main$Y = {
         this.dragData = deepCopy(dragData);
       }
     },
+    fullscreenValue(val) {
+      if (val === this.fullscreen)
+        return;
+      this.fullscreen = val;
+      this.$emit("on-fullscreen", this.fullscreen);
+    },
     loading(val) {
       if (!val) {
         this.buttonLoading = false;
@@ -25067,7 +25105,7 @@ function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
     createElementVNode("div", {
       class: normalizeClass($options.wrapClasses),
       style: normalizeStyle($options.wrapStyles),
-      onClick: _cache[5] || (_cache[5] = (...args) => $options.handleWrapClick && $options.handleWrapClick(...args))
+      onClick: _cache[6] || (_cache[6] = (...args) => $options.handleWrapClick && $options.handleWrapClick(...args))
     }, [
       createVNode(Transition, {
         name: $props.transitionNames[0],
@@ -25077,27 +25115,39 @@ function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
           withDirectives(createElementVNode("div", mergeProps(_ctx.$attrs, {
             class: $options.classes,
             style: $options.mainStyles,
-            onMousedown: _cache[4] || (_cache[4] = (...args) => $options.handleMousedown && $options.handleMousedown(...args))
+            onMousedown: _cache[5] || (_cache[5] = (...args) => $options.handleMousedown && $options.handleMousedown(...args))
           }), [
             createElementVNode("div", {
               class: normalizeClass($options.contentClasses),
               ref: "content",
               style: normalizeStyle($options.contentStyles),
-              onClick: _cache[3] || (_cache[3] = (...args) => $options.handleClickModal && $options.handleClickModal(...args))
+              onClick: _cache[4] || (_cache[4] = (...args) => $options.handleClickModal && $options.handleClickModal(...args))
             }, [
-              $props.closable ? (openBlock(), createElementBlock("a", {
+              $props.showFullscreenIcon ? (openBlock(), createElementBlock("a", {
                 key: 0,
+                class: normalizeClass([$data.prefixCls + "-fullscreen-icon"]),
+                style: normalizeStyle($options.fullscreenIconStyles),
+                onClick: _cache[1] || (_cache[1] = (...args) => $options.handleFullscreen && $options.handleFullscreen(...args))
+              }, [
+                renderSlot(_ctx.$slots, "fullscreen", {}, () => [
+                  createVNode(_component_Icon, {
+                    type: $data.fullscreen ? "md-contract" : "md-expand"
+                  }, null, 8, ["type"])
+                ])
+              ], 6)) : createCommentVNode("", true),
+              $props.closable ? (openBlock(), createElementBlock("a", {
+                key: 1,
                 class: normalizeClass([$data.prefixCls + "-close"]),
-                onClick: _cache[1] || (_cache[1] = (...args) => $options.close && $options.close(...args))
+                onClick: _cache[2] || (_cache[2] = (...args) => $options.close && $options.close(...args))
               }, [
                 renderSlot(_ctx.$slots, "close", {}, () => [
                   createVNode(_component_Icon, { type: "ios-close" })
                 ])
               ], 2)) : createCommentVNode("", true),
               $data.showHead ? (openBlock(), createElementBlock("div", {
-                key: 1,
+                key: 2,
                 class: normalizeClass([$data.prefixCls + "-header"]),
-                onMousedown: _cache[2] || (_cache[2] = (...args) => $options.handleMoveStart && $options.handleMoveStart(...args))
+                onMousedown: _cache[3] || (_cache[3] = (...args) => $options.handleMoveStart && $options.handleMoveStart(...args))
               }, [
                 renderSlot(_ctx.$slots, "header", {}, () => [
                   createElementVNode("div", {
@@ -25111,7 +25161,7 @@ function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
                 renderSlot(_ctx.$slots, "default")
               ], 2),
               !$props.footerHide ? (openBlock(), createElementBlock("div", {
-                key: 2,
+                key: 3,
                 class: normalizeClass([$data.prefixCls + "-footer"])
               }, [
                 renderSlot(_ctx.$slots, "footer", {}, () => [
@@ -25314,57 +25364,60 @@ Modal.newInstance = (properties) => {
   const modal = _instance.refs.modal;
   return {
     show(props) {
-      modal.$parent.showCancel = props.showCancel;
-      modal.$parent.iconType = props.icon;
-      switch (props.icon) {
-        case "info":
-          modal.$parent.iconName = "ios-information-circle";
-          break;
-        case "success":
-          modal.$parent.iconName = "ios-checkmark-circle";
-          break;
-        case "warning":
-          modal.$parent.iconName = "ios-alert";
-          break;
-        case "error":
-          modal.$parent.iconName = "ios-close-circle";
-          break;
-        case "confirm":
-          modal.$parent.iconName = "ios-help-circle";
-          break;
-      }
-      if ("width" in props) {
-        modal.$parent.width = props.width;
-      }
-      if ("closable" in props) {
-        modal.$parent.closable = props.closable;
-      }
-      if ("title" in props) {
-        modal.$parent.title = props.title;
-      }
-      if ("content" in props) {
-        modal.$parent.body = props.content;
-      }
-      if ("okText" in props) {
-        modal.$parent.okText = props.okText;
-      }
-      if ("cancelText" in props) {
-        modal.$parent.cancelText = props.cancelText;
-      }
-      if ("onCancel" in props) {
-        modal.$parent.onCancel = props.onCancel;
-      }
-      if ("onOk" in props) {
-        modal.$parent.onOk = props.onOk;
-      }
-      if ("loading" in props) {
-        modal.$parent.loading = props.loading;
-      }
-      if ("scrollable" in props) {
-        modal.$parent.scrollable = props.scrollable;
-      }
-      modal.$parent.onRemove = props.onRemove;
-      modal.visible = true;
+      nextTick(() => {
+        const modal2 = _instance.refs.modal;
+        modal2.$parent.showCancel = props.showCancel;
+        modal2.$parent.iconType = props.icon;
+        switch (props.icon) {
+          case "info":
+            modal2.$parent.iconName = "ios-information-circle";
+            break;
+          case "success":
+            modal2.$parent.iconName = "ios-checkmark-circle";
+            break;
+          case "warning":
+            modal2.$parent.iconName = "ios-alert";
+            break;
+          case "error":
+            modal2.$parent.iconName = "ios-close-circle";
+            break;
+          case "confirm":
+            modal2.$parent.iconName = "ios-help-circle";
+            break;
+        }
+        if ("width" in props) {
+          modal2.$parent.width = props.width;
+        }
+        if ("closable" in props) {
+          modal2.$parent.closable = props.closable;
+        }
+        if ("title" in props) {
+          modal2.$parent.title = props.title;
+        }
+        if ("content" in props) {
+          modal2.$parent.body = props.content;
+        }
+        if ("okText" in props) {
+          modal2.$parent.okText = props.okText;
+        }
+        if ("cancelText" in props) {
+          modal2.$parent.cancelText = props.cancelText;
+        }
+        if ("onCancel" in props) {
+          modal2.$parent.onCancel = props.onCancel;
+        }
+        if ("onOk" in props) {
+          modal2.$parent.onOk = props.onOk;
+        }
+        if ("loading" in props) {
+          modal2.$parent.loading = props.loading;
+        }
+        if ("scrollable" in props) {
+          modal2.$parent.scrollable = props.scrollable;
+        }
+        modal2.$parent.onRemove = props.onRemove;
+        modal2.visible = true;
+      });
     },
     remove() {
       modal.visible = false;
@@ -28202,6 +28255,7 @@ function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
 }
 var Options = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["render", _sfc_render$E]]);
 const prefixCls$m = "ivu-page";
+const sizes = ["small", "default"];
 const _sfc_main$M = {
   name: "Page",
   mixins: [Locale],
@@ -28240,8 +28294,13 @@ const _sfc_main$M = {
       }
     },
     size: {
+      type: String,
+      default() {
+        const global2 = getCurrentInstance().appContext.config.globalProperties;
+        return global2.$VIEWUI && oneOf(global2.$VIEWUI.size, sizes) ? global2.$VIEWUI.size : "default";
+      },
       validator(value) {
-        return oneOf(value, ["small", "default"]);
+        return oneOf(value, sizes);
       }
     },
     simple: {
@@ -31518,12 +31577,12 @@ const _sfc_main$w = {
     size: {
       type: [String, Number, Array],
       validator(value) {
-        const sizes = ["small", "large", "default"];
+        const sizes2 = ["small", "large", "default"];
         if (typeof value === "string") {
-          return oneOf(value, sizes);
+          return oneOf(value, sizes2);
         }
         if (Array.isArray(value)) {
-          return value.length > 0 && value.every((i) => typeof i === "number" || oneOf(i, sizes));
+          return value.length > 0 && value.every((i) => typeof i === "number" || oneOf(i, sizes2));
         }
         return true;
       },
@@ -38381,11 +38440,11 @@ var style = {
     }
   }
 };
-const name = "view-ui-plus";
-const version$1 = "1.3.15";
+const name = "@leisure01/view-ui-plus";
+const version$1 = "1.3.19";
 const title = "ViewUIPlus";
 const description = "A high quality UI components Library with Vue.js 3";
-const homepage = "http://www.iviewui.com";
+const homepage = "https://www.iviewui.com";
 const keywords = [
   "iview",
   "vue",
