@@ -11,6 +11,18 @@ View UI Plus
 
 > View UI Plus自从发布1.3.1版本后基本上就不再维护更新，但由于工作开发中涉及该UI库，因此本人另开分支继续维护开发使用。
 
+> 二次开发
+> ```
+> # 打包
+> npm run build
+> # 发布（发布前需要登录账号，执行npm login根据提示来就行了，第一次发布失败的话，可能还需要执行npm config set access public）
+> npm publish
+> # 撤销发布
+> npm unpublish @leisure01/view-ui-plus@1.3.21 --force
+> # 本地调试预览
+> npm run dev
+>
+> ```
 
 [![View UI Plus](https://img.shields.io/npm/v/@leisure01/view-ui-plus.svg?style=flat-square)](https://www.npmjs.org/package/@leisure01/view-ui-plus)
 [![NPM downloads](http://img.shields.io/npm/dm/@leisure01/view-ui-plus.svg?style=flat-square)](https://npmjs.org/package/@leisure01/view-ui-plus)
