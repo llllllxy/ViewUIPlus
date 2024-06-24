@@ -35,6 +35,9 @@ export default {
     },
     mounted() {
         this.$Spin.show();
+        setTimeout(() => {
+            this.$Spin.hide();
+        }, 3000)
     }
 }
 </script>
