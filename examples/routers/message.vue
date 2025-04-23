@@ -91,7 +91,7 @@
                 });
             }
         },
-        mounted () {
+        created () {
             this.success();
         }
     }
