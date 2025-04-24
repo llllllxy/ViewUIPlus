@@ -10609,7 +10609,9 @@ const _sfc_main$1U = {
     },
     currentValue() {
       if (this.CheckboxGroupInstance) {
-        return this.CheckboxGroupInstance.modelValue.indexOf(this.label) >= 0;
+        let modelValue = this.CheckboxGroupInstance.modelValue;
+        modelValue = Array.isArray(modelValue) ? modelValue : [];
+        return modelValue.indexOf(this.label) >= 0;
       } else {
         return this.modelValue === this.trueValue;
       }
@@ -14929,15 +14931,19 @@ Notification$1.newInstance = (properties) => {
   const notification = _instance.refs.notification;
   return {
     notice(noticeProps) {
-      notification.add(noticeProps);
+      nextTick(() => {
+        _instance.refs.notification.add(noticeProps);
+      });
     },
     remove(name2) {
-      notification.close(name2);
+      nextTick(() => {
+        _instance.refs.notification.close(name2);
+      });
     },
     component: notification,
     destroy(element) {
-      notification.closeAll();
       isClient && setTimeout(function() {
+        _instance.refs.notification.closeAll();
         const removeElement = document.querySelectorAll(`.${element}`)[0];
         if (container && removeElement) {
           container.removeChild(removeElement);
@@ -19068,6 +19074,11 @@ const _sfc_main$1o = {
         }
       ];
     },
+    wrapStyles() {
+      return {
+        zIndex: this.zIndex
+      };
+    },
     mainStyles() {
       let style2 = {};
       if (this.placement === "left" || this.placement === "right") {
@@ -19302,6 +19313,7 @@ function _sfc_render$1b(_ctx, _cache, $props, $setup, $data, $options) {
       }),
       createElementVNode("div", {
         class: normalizeClass($options.wrapClasses),
+        style: normalizeStyle($options.wrapStyles),
         onClick: _cache[3] || (_cache[3] = (...args) => $options.handleWrapClick && $options.handleWrapClick(...args))
       }, [
         createVNode(Transition, { name: $options.transitionName }, {
@@ -19355,7 +19367,7 @@ function _sfc_render$1b(_ctx, _cache, $props, $setup, $data, $options) {
           ]),
           _: 3
         }, 8, ["name"])
-      ], 2)
+      ], 6)
     ], 512)
   ], 8, ["disabled"]);
 }
@@ -23689,7 +23701,7 @@ Spin.newInstance = (properties) => {
       });
     },
     remove(cb) {
-      spin.visible = false;
+      _instance.refs.spin.visible = false;
       setTimeout(function() {
         Instance.unmount();
         document.body.removeChild(container);
@@ -32625,6 +32637,12 @@ var Mixin = {
         }
       ];
     },
+    mergeStyles(column) {
+      if (column._sticky === "left") {
+        return column._styles || {};
+      }
+      return {};
+    },
     isPopperShow(column) {
       return column.filters && (!this.fixed && !column.fixed || this.fixed === "left" && column.fixed === "left" || this.fixed === "right" && column.fixed === "right");
     },
@@ -32981,6 +32999,7 @@ function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
               key: index2,
               colspan: column.colSpan,
               rowspan: column.rowSpan,
+              style: normalizeStyle(_ctx.mergeStyles(column)),
               class: normalizeClass(_ctx.alignCls(column))
             }, [
               createElementVNode("div", {
@@ -33137,7 +33156,7 @@ function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
                 onMousemove: ($event) => $options.handleMouseMove(column, $event),
                 onMouseout: _cache[0] || (_cache[0] = (...args) => $options.handleMouseOut && $options.handleMouseOut(...args))
               }, null, 40, _hoisted_8)) : createCommentVNode("", true)
-            ], 10, _hoisted_3$7);
+            ], 14, _hoisted_3$7);
           }), 128)),
           _ctx.$parent.showVerticalScrollBar && rowIndex === 0 ? (openBlock(), createElementBlock("th", {
             key: 0,
@@ -33762,8 +33781,13 @@ const _sfc_main$l = {
             expanded: this.rowExpanded(row._index),
             key: column._columnKey
           });
+          let styles = {};
+          if (column._sticky === "left" && column._styles) {
+            styles = column._styles;
+          }
           const $td = h("td", __spreadProps(__spreadValues({
-            class: this.alignCls(column, row)
+            class: this.alignCls(column, row),
+            style: styles
           }, this.getSpan(row, column, index2, colIndex)), {
             onClick: (e) => this.clickCell(row, column, column.key, e)
           }), [$tableCell]);
@@ -38441,7 +38465,7 @@ var style = {
   }
 };
 const name = "@leisure01/view-ui-plus";
-const version$1 = "1.3.20";
+const version$1 = "1.3.22";
 const title = "ViewUIPlus";
 const description = "A high quality UI components Library with Vue.js 3";
 const homepage = "https://www.iviewui.com";
@@ -38481,7 +38505,7 @@ const bugs = {
   url: "https://github.com/view-design/ViewUIPlus/issues"
 };
 const dependencies = {
-  "async-validator": "^3.3.0",
+  "async-validator": "^3.5.2",
   "countup.js": "^1.9.3",
   dayjs: "^1.11.0",
   deepmerge: "^2.2.1",
